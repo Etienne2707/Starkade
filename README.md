@@ -16,6 +16,10 @@ Deploying your local copy is made easy with containers. Here's how you can get s
 
 `git clone https://github.com/Etienne2707/Starkade.git && cd Starkade`
 
+2. Install the dependencies
+
+`make install`
+
 2. Start the project
 
 `make dev`
