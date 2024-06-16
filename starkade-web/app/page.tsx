@@ -5,19 +5,19 @@ import React from "react";
 const App = () => {
   const games = [
     {
-      link: "games/dos",
+      link: "games/wip",
       image:
         "/wip.jpg",
       name: `DOS`,
     },
     {
-      link: "games/rock_paper_scissors",
+      link: "games/wip",
       image:
         "/wip.jpg",
       name: `Rock\, Paper\, Scissors`,
     },
     {
-      link: "games/market_brawl",
+      link: "games/wip",
       image:
         "/wip.jpg",
       name: `Market Brawl`,
@@ -26,19 +26,19 @@ const App = () => {
       link: "games/wip",
       image:
         "/wip.jpg",
-      name: `Work in progress`,
+      name: `Sample Game 1`,
     },
     {
       link: "games/wip",
       image:
         "/wip.jpg",
-      name: `Work in progress`,
+      name: `Sample Game 2`,
     },
     {
       link: "games/wip",
       image:
         "/wip.jpg",
-      name: `Work in progress`,
+      name: `Sample Game 3`,
     },
   ];
   return (
@@ -46,50 +46,38 @@ const App = () => {
       <div className="">
         <div className="p-6 container mx-auto">
           <div className="py-2">
-            <h1 className="text-center text-4xl">Starkade</h1>
+            <h1>Starkade</h1>
+            <p className="text-center text-xl text-pink">Onchain games made easy</p>
           </div>
-          <div className="md:grid md:gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
+          <ul className="grid sm:grid-cols-1 sm:gap-2 md:gap-x-2 md:grid-cols-2 lg:grid-cols-3 mb-12">
             {games.map((game) => {
               return (
                 <>
-                  <article
+                  <li
                     key={game.name}
-                    className="p-6 mb-6  transition duration-300 group transform hover:-translate-y-2 hover:shadow-2xl rounded-2xl cursor-pointer"
+                    className="p-4 group rounded-2xl cursor-pointer"
                   >
-                    <Link
-                      href={game.link}
-                      className="absolute opacity-0 top-0 right-0 left-0 bottom-0"
-                    />
-                    <div className="relative mb-4 rounded-2xl">
-                      <Image
-                        width={400}
-                        height={400}
-                        className="max-h-80 rounded-2xl w-full object-cover transition-transform duration-300 transform group-hover:scale-105"
-                        src={game.image}
-                        alt=""
-                      />
-                      <Link
-                        className="flex justify-center items-center bg-black bg-opacity-60  absolute top-0 left-0 w-full h-full text-white rounded-2xl opacity-0 transition-all duration-300 transform group-hover:scale-105 text-xl group-hover:opacity-100"
-                        href={game.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Play {game.name}
+                    <div className="relative rounded-2xl">
+                      <Link href={game.link}>
+                        <Image
+                          width={400}
+                          height={400}
+                          className="max-h-80 rounded-2xl w-full object-cover duration-300 group-hover:scale-105 hover:shadow-2xl"
+                          src={game.image}
+                          alt=""
+                        />
+                        <p
+                        className="bg-black bg-opacity-70 absolute bottom-0 left-0 p-1 ml-2 mb-2 text-white rounded-lg duration-300 text-xl group-hover:bg-opacity-55"
+                        >
+                          {game.name}
+                        </p>
                       </Link>
                     </div>
-                    <h3 className="font-medium text-xl leading-8">
-                      <Link
-                        href={game.link}
-                        className="block relative group-hover:text-purple-500 transition-colors duration-200"
-                      >
-                        <span dangerouslySetInnerHTML={{ __html: game.name }} />
-                      </Link>
-                    </h3>
-                  </article>
+                  </li>
                 </>
               );
             })}
-          </div>
+          </ul>
         </div>
       </div>
     </>
