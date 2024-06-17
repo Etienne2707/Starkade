@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 
 const App = () => {
   const games = [
@@ -46,8 +45,8 @@ const App = () => {
       <div className="">
         <div className="p-6 container mx-auto">
           <div className="py-2">
-            <h1>Starkade</h1>
-            <p className="text-center text-xl text-pink">Onchain games made easy</p>
+            <h2>Onchain games made easy</h2>
+            <p className="text-center text-xl text-pink">Explore our collection of simple onchain games and start playing right away!</p>
           </div>
           <ul className="grid sm:grid-cols-1 sm:gap-2 md:gap-x-2 md:grid-cols-2 lg:grid-cols-3 mb-12">
             {games.map((game) => {
