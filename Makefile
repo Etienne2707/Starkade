@@ -2,7 +2,7 @@ NODE_VERSION=20
 CONTAINER=docker
 DEV_PORT=3000
 KATANA_PORT=5050
-DOJO_VERSION=0.7.0-alpha.5
+DOJO_VERSION=0.7.1
 
 dev:
 	${CONTAINER} run -it -v ./starkade-web:/usr/src/app -w /usr/src/app -p ${DEV_PORT}:3000 docker.io/library/node:${NODE_VERSION} npm run dev

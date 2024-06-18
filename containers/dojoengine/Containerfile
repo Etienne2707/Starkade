@@ -9,6 +9,6 @@ RUN apt-get update && apt-get install -y curl git && rm -rf /var/lib/apt/lists/*
 RUN curl -L https://install.dojoengine.org | bash
 RUN . ~/.bashrc && dojoup --version ${DOJO_VERSION}
 
-COPY entrypoint.sh .
+COPY entrypoint.sh /entrypoint.sh
 
-ENTRYPOINT ["sh", "./entrypoint.sh"]
+ENTRYPOINT ["sh", "/entrypoint.sh"]
