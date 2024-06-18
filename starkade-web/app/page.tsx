@@ -22,7 +22,7 @@ const App = () => {
       name: `Market Brawl`,
     },
     {
-      link: "games/wip",
+      link: "games/test_game",
       image:
         "/wip.jpg",
       name: `Sample Game 1`,
