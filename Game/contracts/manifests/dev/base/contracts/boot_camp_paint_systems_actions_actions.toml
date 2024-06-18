@@ -1,0 +1,10 @@
+kind = "DojoContract"
+class_hash = "0x6c57ede427c4287cfd2b4134917be524be89dc4766e0ef734cef9ef425bf154"
+original_class_hash = "0x6c57ede427c4287cfd2b4134917be524be89dc4766e0ef734cef9ef425bf154"
+base_class_hash = "0x0"
+abi = "manifests/dev/abis/base/contracts/boot_camp_paint_systems_actions_actions.json"
+reads = []
+writes = []
+computed = []
+init_calldata = []
+name = "boot_camp_paint::systems::actions::actions"
