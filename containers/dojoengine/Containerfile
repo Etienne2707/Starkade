@@ -1,0 +1,14 @@
+FROM docker.io/library/debian:12
+
+ARG DOJO_VERSION
+
+# Dependencies
+RUN apt-get update && apt-get install -y curl git && rm -rf /var/lib/apt/lists/*
+
+# Install dojo
+RUN curl -L https://install.dojoengine.org | bash
+RUN . ~/.bashrc && dojoup --version ${DOJO_VERSION}
+
+COPY entrypoint.sh .
+
+ENTRYPOINT ["sh", "./entrypoint.sh"]
