@@ -46,6 +46,19 @@ build : | ${CACHES}
 		localhost/dojo:${DOJO_VERSION} \
 		sozo build
 
+test : | ${CACHES}
+	${CONTAINER} run \
+		-v ./:/usr/src/app \
+		-v ./__container_cache__/cargo_registry:/root/.cargo/registry \
+		-v ./__container_cache__/cargo_git:/root/.cargo/git \
+		-v ./__container_cache__/scarb:/root/.cache/scarb \
+		-v ./__container_cache__/rustup:/root/.rustup \
+		-w /usr/src/app \
+		--replace \
+		--name ${GAME}-build \
+		localhost/dojo:${DOJO_VERSION} \
+		sozo test
+
 katana : network
 	-${CONTAINER} run -d \
 		--${NETWORK} ${GAME} \
