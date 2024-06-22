@@ -1,5 +1,4 @@
 use starknet::ContractAddress;
-use dojo_starter::utils::{ZERO};
 
 mod errors {
     const PLAYER_DOES_NOT_EXIST: felt252 = 'Player: does not exist';
@@ -14,35 +13,28 @@ struct Player {
     #[key]
     address : ContractAddress,
     name : felt252,
-    game_id : u128,
+    game_id : u32,
 }
 
 #[generate_trait]
 impl PlayerImpl of PlayerTrait {
-
     #[inline(always)]
-    fn new(address: ContractAddress, name: felt252, game_id : u128) -> Player {
+    fn new(address: ContractAddress, name: felt252, game_id : u32) -> Player {
         Player { address , name, game_id}
     }
-
     #[inline(always)]
-    fn get_gameid(self : Player) -> u128 {
+    fn get_gameid(self : Player) -> u32 {
         return self.game_id;
     }
-
     #[inline(always)]
     fn get_name(self : Player) -> felt252 {
         return self.name;
     }
-
     #[inline(always)] 
     fn default(self : Player) -> Player {
         Self::new(self.address, self.name, 0)
     }
-
-
 }
-
 
 #[generate_trait]
 impl PlayerAssert of AssertTrait {
@@ -60,7 +52,7 @@ impl PlayerAssert of AssertTrait {
 impl PlayerZeroable of Zeroable<Player> {
     #[inline(always)]
     fn zero() -> Player {
-        Player { address: ZERO(), name: 0, game_id : 0}
+        Player { address: starknet::contract_address_const::<0x0>(), name: 0, game_id : 0}
     }
     #[inline(always)]
     fn is_zero(self : Player) -> bool {

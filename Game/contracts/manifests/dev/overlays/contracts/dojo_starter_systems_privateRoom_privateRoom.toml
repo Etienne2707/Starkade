@@ -1,0 +1,4 @@
+name = "dojo_starter::systems::privateRoom::privateRoom"
+reads = []
+writes = ["Player", "Game", "Queue"]
+init_calldata = []

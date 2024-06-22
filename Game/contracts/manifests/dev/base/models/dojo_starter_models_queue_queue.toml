@@ -1,0 +1,15 @@
+kind = "DojoModel"
+class_hash = "0x25b2ead4b5b0e170d7ca70f70000fbff7a0baf075d1c490eea86742ce0cb520"
+original_class_hash = "0x25b2ead4b5b0e170d7ca70f70000fbff7a0baf075d1c490eea86742ce0cb520"
+abi = "manifests/dev/abis/base/models/dojo_starter_models_queue_queue.json"
+name = "dojo_starter::models::queue::queue"
+
+[[members]]
+name = "queue_id"
+type = "felt252"
+key = true
+
+[[members]]
+name = "player"
+type = "starknet::ContractAddress"
+key = false

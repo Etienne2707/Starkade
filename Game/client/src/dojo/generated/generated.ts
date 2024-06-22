@@ -12,11 +12,11 @@ export interface MoveProps {
 }
 
 export async function setupWorld(provider: DojoProvider) {
-    function actions() {
+    function privateRoom() {
         const create_player = async ({ account }: { account: AccountInterface }) => {
           try {
             return await provider.execute(account, {
-              contractName: "actions",
+              contractName: "privateRoom",
               entrypoint: "create_player",
               calldata: [],
             });
@@ -29,7 +29,7 @@ export async function setupWorld(provider: DojoProvider) {
         const create_game = async ({ account }: { account: AccountInterface }) => {
           try {
             return await provider.execute(account, {
-              contractName: "actions",
+              contractName: "privateRoom",
               entrypoint: "create_game",
               calldata: [],
             });
@@ -49,7 +49,7 @@ export async function setupWorld(provider: DojoProvider) {
         }) => {
           try {
             return await provider.execute(account, {
-              contractName: "actions",
+              contractName: "privateRoom",
               entrypoint: "join",
               calldata: [game_id],
             });
@@ -68,7 +68,7 @@ export async function setupWorld(provider: DojoProvider) {
         }) => {
           try {
             return await provider.execute(account, {
-              contractName: "actions",
+              contractName: "privateRoom",
               entrypoint: "leave",
               calldata: [game_id],
             });
@@ -80,7 +80,45 @@ export async function setupWorld(provider: DojoProvider) {
         return { create_player, create_game, join, leave };
 
     }
-        return {
-            actions: actions(),
+
+    function publicRoom() {
+
+      const unregister = async ({ account }: { account: AccountInterface }) => {
+        try {
+          return await provider.execute(account, {
+            contractName: "publicRoom",
+            entrypoint: "unregister",
+            calldata: [],
+          });
+        } catch (error) {
+          console.error("Error executing register:", error);
+          throw error;
+        }
+      };
+  
+      const register = async ({
+        account,
+        name,
+      }: {
+        account: AccountInterface;
+        name : bigint;
+      }) => {
+        try {
+          return await provider.execute(account, {
+            contractName: "publicRoom",
+            entrypoint: "register",
+            calldata: [name],
+          });
+        } catch (error) {
+          console.error("Error executing register:", error);
+          throw error;
+        }
+      };
+      return { register,unregister };
+
+  }
+      return {
+            privateRoom: privateRoom(),
+            publicRoom : publicRoom(),
       };
 }

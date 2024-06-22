@@ -12,5 +12,6 @@ export function createClientComponents({
         ...contractComponents,
         Player: overridableComponent(contractComponents.Player),
         Game: overridableComponent(contractComponents.Game),
+        Queue : overridableComponent(contractComponents.Queue),
     };
 }

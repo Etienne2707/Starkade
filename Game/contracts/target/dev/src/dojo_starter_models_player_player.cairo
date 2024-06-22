@@ -13,7 +13,7 @@ impl PlayerIntrospect<> of dojo::database::introspect::Introspect<Player<>> {
                 },
                 dojo::database::introspect::FieldLayout {
                     selector: 798447457383454215276135704722229949685978006685015760720475734520384550483,
-                    layout: dojo::database::introspect::Introspect::<u128>::layout()
+                    layout: dojo::database::introspect::Introspect::<u32>::layout()
                 }
             ]
                 .span()
@@ -40,7 +40,7 @@ impl PlayerIntrospect<> of dojo::database::introspect::Introspect<Player<>> {
                     dojo::database::introspect::Member {
                         name: 'game_id',
                         attrs: array![].span(),
-                        ty: dojo::database::introspect::Introspect::<u128>::ty()
+                        ty: dojo::database::introspect::Introspect::<u32>::ty()
                     }
                 ]
                     .span()

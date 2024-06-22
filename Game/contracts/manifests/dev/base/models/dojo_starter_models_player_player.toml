@@ -1,6 +1,6 @@
 kind = "DojoModel"
-class_hash = "0x68e81bc1f4a0f3e3d77d20c41fdef76ef8cdda4fa73240da622f6e0f3eb1eaf"
-original_class_hash = "0x68e81bc1f4a0f3e3d77d20c41fdef76ef8cdda4fa73240da622f6e0f3eb1eaf"
+class_hash = "0x418b5c3fa70cec3e35a02db05d82f94b3211dc4b0c5004510ecf89c24a5b611"
+original_class_hash = "0x418b5c3fa70cec3e35a02db05d82f94b3211dc4b0c5004510ecf89c24a5b611"
 abi = "manifests/dev/abis/base/models/dojo_starter_models_player_player.json"
 name = "dojo_starter::models::player::player"
 
@@ -16,5 +16,5 @@ key = false
 
 [[members]]
 name = "game_id"
-type = "u128"
+type = "u32"
 key = false

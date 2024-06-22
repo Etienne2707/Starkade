@@ -8,86 +8,50 @@ mod tests {
     // import test utils
     use dojo_starter::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
-        models::{game::{Game,GameTrait,GameState,game}, player::{Player,PlayerTrait,PlayerAssert,player}}
+        models::{position::{Position, Vec2, position}, moves::{Moves, Direction, moves}}
     };
-    use dojo_starter::constant::{ZERO};
 
     #[test]
-    fn test_world() {
+    fn test_move() {
+        // caller
+        let caller = starknet::contract_address_const::<0x0>();
 
-        let player_1 = starknet::contract_address_const::<0x10>();
-        let player_2 = starknet::contract_address_const::<0x15>();
-        let player_3 = starknet::contract_address_const::<0x20>();
+        // models
+        let mut models = array![position::TEST_CLASS_HASH, moves::TEST_CLASS_HASH];
 
-
-        let mut models = array![game::TEST_CLASS_HASH, player::TEST_CLASS_HASH];
-
+        // deploy world with models
         let world = spawn_test_world(models);
 
-
+        // deploy systems contract
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
         let actions_system = IActionsDispatcher { contract_address };
 
+        // call spawn()
+        actions_system.spawn();
 
-        let A = actions_system.create_player(player_1);
-        let B = actions_system.create_player(player_2);
-        let C = actions_system.create_player(player_3);
+        // call move with direction right
+        actions_system.move(Direction::Right);
 
-        assert(A.get_name() != 0, 'Name errure');
-        assert(B.get_name() != 0, 'Name errure 2');
+        // Check world state
+        let moves = get!(world, caller, Moves);
 
+        // casting right direction
+        let right_dir_felt: felt252 = Direction::Right.into();
 
-        let game = actions_system.create_game(player_1);
-        let gameId = A.get_gameid();
-        assert(game.game_id == gameId, 'Erreyr de gameId');
-        assert(game.player_1 == player_1, 'Erreur player 1 not in game');
-        actions_system.join(player_2,gameId);
-        let game = get!(world , (gameId), Game);
-        assert(game.player_2 == player_2, 'PLayer 2 join error');
-        assert(game.state == GameState::Lock, 'Game full but not locked');
-        actions_system.leave(player_2,gameId);
-        let game = get!(world , (gameId), Game);
-        let B = get!(world,(player_2), Player);
-        assert(game.player_2 == ZERO(), 'Not reset player 2 after leave');
-        assert(B.game_id == 0, 'PLayer 2 game_id no reset');
-        actions_system.join(player_3, gameId);
-        let game = get!(world , (gameId), Game);
-        assert(game.player_2 == C.address, 'Player 3 join no update');
-        actions_system.leave(player_1,gameId);
-        let game = get!(world , (gameId), Game);
-        assert(game.game_id == 0 && game.player_1 == ZERO() && game.player_2 == ZERO(), 'Allez');
-       // actions_system.leave(player_2,gameId);
+        // check moves
+        assert(moves.remaining == 99, 'moves is wrong');
 
-        //actions_system.join(player_3,gameId);
+        // check last direction
+        assert(moves.last_direction.into() == right_dir_felt, 'last direction is wrong');
 
-    }
+        // get new_position
+        let new_position = get!(world, caller, Position);
 
-    #[test]
-    #[should_panic]
-    fn same_player_created() {
+        // check new position x
+        assert(new_position.vec.x == 11, 'position x is wrong');
 
-        let player_1 = starknet::contract_address_const::<0x10>();
-
-        let mut models = array![game::TEST_CLASS_HASH, player::TEST_CLASS_HASH];
-
-        let world = spawn_test_world(models);
-
-
-        let contract_address = world
-            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-        let actions_system = IActionsDispatcher { contract_address };
-
-
-        actions_system.create_player(player_1);
-        actions_system.create_player(player_1);        
-
-    }
-
-    #[test]
-    #[should_panic]
-    fn empty() {
-        let test = starknet::contract_address_const::<0x10>();
-        assert(test == ZERO(), '');
+        // check new position y
+        assert(new_position.vec.y == 10, 'position y is wrong');
     }
 }

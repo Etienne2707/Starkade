@@ -1,0 +1,10 @@
+kind = "DojoContract"
+class_hash = "0x6de0bbed6ac2db23810ad463def8977a1fde038eea8781bad3a7178feef4409"
+original_class_hash = "0x6de0bbed6ac2db23810ad463def8977a1fde038eea8781bad3a7178feef4409"
+base_class_hash = "0x0"
+abi = "manifests/dev/abis/base/contracts/dojo_starter_systems_privateRoom_privateRoom.json"
+reads = []
+writes = []
+computed = []
+init_calldata = []
+name = "dojo_starter::systems::privateRoom::privateRoom"

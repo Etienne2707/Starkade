@@ -16,7 +16,7 @@ export function createSystemCalls(
 ) {
   const create_player = async (account: AccountInterface) => {
     try {
-      const { transaction_hash } = await client.actions.create_player({
+      const { transaction_hash } = await client.privateRoom.create_player({
         account,
       });
 
@@ -38,7 +38,7 @@ export function createSystemCalls(
 
   const create_game = async (account: AccountInterface) => {
     try {
-      const { transaction_hash } = await client.actions.create_game({
+      const { transaction_hash } = await client.privateRoom.create_game({
         account,
       });
 
@@ -66,7 +66,7 @@ export function createSystemCalls(
     game_id: number;
   }) => {
     try {
-      const { transaction_hash } = await client.actions.join({
+      const { transaction_hash } = await client.privateRoom.join({
         account,
         game_id,
       });
@@ -95,7 +95,7 @@ export function createSystemCalls(
     game_id: number;
   }) => {
     try {
-      const { transaction_hash } = await client.actions.leave({
+      const { transaction_hash } = await client.privateRoom.leave({
         account,
         game_id,
       });
@@ -116,11 +116,67 @@ export function createSystemCalls(
     }
   };
 
+  const register = async ({
+    account,
+    name,
+  }: {
+    account: AccountInterface;
+    name: bigint;
+  }) => {
+    try {
+      const { transaction_hash } = await client.publicRoom.register({
+        account,
+        name,
+      });
+
+      await account.waitForTransaction(transaction_hash, {
+        retryInterval: 100,
+      });
+
+      console.log(
+        await account.waitForTransaction(transaction_hash, {
+          retryInterval: 100,
+        })
+      );
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const unregister = async (account: AccountInterface) => {
+    try {
+      const { transaction_hash } = await client.publicRoom.unregister({
+        account,
+      });
+
+      await account.waitForTransaction(transaction_hash, {
+        retryInterval: 100,
+      });
+
+      console.log(
+        await account.waitForTransaction(transaction_hash, {
+          retryInterval: 100,
+        })
+      );
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+
+
+
 
   return {
     create_player,
     create_game,
     join,
     leave,
+    register,
+    unregister,
   };
 }

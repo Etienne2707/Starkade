@@ -59,44 +59,51 @@
     "interface_name": "dojo_starter::systems::actions::IActions"
   },
   {
+    "type": "enum",
+    "name": "dojo_starter::models::moves::Direction",
+    "variants": [
+      {
+        "name": "None",
+        "type": "()"
+      },
+      {
+        "name": "Left",
+        "type": "()"
+      },
+      {
+        "name": "Right",
+        "type": "()"
+      },
+      {
+        "name": "Up",
+        "type": "()"
+      },
+      {
+        "name": "Down",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "type": "interface",
     "name": "dojo_starter::systems::actions::IActions",
     "items": [
       {
         "type": "function",
-        "name": "leave",
-        "inputs": [
-          {
-            "name": "game_id",
-            "type": "core::integer::u128"
-          }
-        ],
-        "outputs": [],
-        "state_mutability": "external"
-      },
-      {
-        "type": "function",
-        "name": "join",
-        "inputs": [
-          {
-            "name": "game_id",
-            "type": "core::integer::u128"
-          }
-        ],
-        "outputs": [],
-        "state_mutability": "external"
-      },
-      {
-        "type": "function",
-        "name": "create_player",
+        "name": "spawn",
         "inputs": [],
         "outputs": [],
         "state_mutability": "external"
       },
       {
         "type": "function",
-        "name": "create_game",
-        "inputs": [],
+        "name": "move",
+        "inputs": [
+          {
+            "name": "direction",
+            "type": "dojo_starter::models::moves::Direction"
+          }
+        ],
         "outputs": [],
         "state_mutability": "external"
       }

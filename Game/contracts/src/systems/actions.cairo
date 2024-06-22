@@ -1,104 +1,98 @@
-use starknet::ContractAddress;
-use dojo::world::IWorldDispatcher;
-use dojo_starter::models::player::{Player};
-use dojo_starter::models::game::{Game};
+use dojo_starter::models::moves::Direction;
+use dojo_starter::models::position::Position;
 
 // define the interface
 #[dojo::interface]
 trait IActions {
-    //fn create_game(ref world : IWorldDispatcher , player_2 : ContractAddress);
-    fn leave(ref world : IWorldDispatcher, game_id : u128);
-    fn join(ref world : IWorldDispatcher, game_id : u128);
-    fn create_player(ref world: IWorldDispatcher);
-    fn create_game(ref world: IWorldDispatcher);
-    }
+    fn spawn(ref world: IWorldDispatcher);
+    fn move(ref world: IWorldDispatcher, direction: Direction);
+}
 
 // dojo decorator
 #[dojo::contract]
 mod actions {
-    use super::{IActions};
+    use super::{IActions, next_position};
     use starknet::{ContractAddress, get_caller_address};
     use dojo_starter::models::{
-        game::{Game,GameTrait,GameState}, player::{Player,PlayerTrait,PlayerAssert}
+        position::{Position, Vec2}, moves::{Moves, Direction, DirectionsAvailable}
     };
-   use dojo_starter::utils::{uuid};
+
+    #[derive(Copy, Drop, Serde)]
+    #[dojo::model]
+    #[dojo::event]
+    struct Moved {
+        #[key]
+        player: ContractAddress,
+        direction: Direction,
+    }
 
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
-
-        fn create_player(ref world: IWorldDispatcher){
-            let address = get_caller_address();
-            let player = get!(world,(address),Player);
-            //assert(player.name == 0, 'Erreur player aldready exist !');
-
-            let _name : felt252 = 'Player';
-            let player = PlayerTrait::new(address,_name,0);
-
-            set!(world,(player));
-        }
-        fn create_game(ref world: IWorldDispatcher, ) {
+        fn spawn(ref world: IWorldDispatcher) {
             // Get the address of the current caller, possibly the player's address.
-            let address = get_caller_address();
-            let player = get!(world, (address), Player);
-            assert(player.name != 0, 'Create a player before a game !');
+            let player = get_caller_address();
+            // Retrieve the player's current position from the world.
+            let position = get!(world, player, (Position));
 
-            let game_id = uuid(world);
+            // Update the world state with the new data.
+            // 1. Set the player's remaining moves to 100.
+            // 2. Move the player's position 10 units in both the x and y direction.
+            // 3. Set available directions to all four directions. (This is an example of how you can use an array in Dojo).
 
-            let game = GameTrait::new(game_id,address,starknet::contract_address_const::<0x0>(), GameState::Waiting);
-            set!(world,(game));
-        }
+            let directions_available = DirectionsAvailable {
+                player,
+                directions: array![
+                    Direction::Up, Direction::Right, Direction::Down, Direction::Left
+                ],
+            };
 
-        fn leave(ref world : IWorldDispatcher, game_id : u128) {
-            let address = get_caller_address();
-            let mut game = get!(world,(game_id), Game);
-            let mut player = get!(world,(address), Player);
-            //Add player checker
-            assert(player.name != 0, 'Players do not exist !');
-            assert(game.player_2 == address || game.player_1 == address, 'Player not in game');
-           // assert(game.state == GameState::Lock || game.state == GameState::Waiting && game.game_id != 0 , 'Cant leave now the game !');
-            if (game.player_2 == address) {
-                game.player_2 = starknet::contract_address_const::<0x0>();
-                game.state = GameState::Waiting;
-                PlayerTrait::default(player);
-                set!(world,(player));
-                set!(world,(game));
-            }
-            else {
-                let second = get!(world,(game.player_2),Player);
-                PlayerTrait::default(player);
-                PlayerTrait::default(second);
-                set!(world,(player));
-                set!(world,(second));
-                delete!(world,(game));
-
-            }
-        }
-
-        fn join(ref world : IWorldDispatcher , game_id : u128) {
-
-            let address = get_caller_address();
-            let mut game = get!(world,(game_id), Game);
-            let mut player = get!(world,(address), Player);
-            //Add player checker
-            assert(player.name != 0, 'Players do not exist !');
-
-
-            let (players_1, _players_2) = game.get_address();
-            
-
-            assert(players_1 != address, 'Try to join the same person');
-            assert(game.state == GameState::Waiting , 'Party full !');
-            game.player_2 = address;
-            game.state = GameState::Lock;
-            player.game_id = GameTrait::get_gameid(game);
-            set!(world, (game));
-
+            set!(
+                world,
+                (
+                    Moves {
+                        player, remaining: 100, last_direction: Direction::None(()), can_move: true
+                    },
+                    Position {
+                        player, vec: Vec2 { x: position.vec.x + 10, y: position.vec.y + 10 }
+                    },
+                    directions_available
+                )
+            );
         }
 
         // Implementation of the move function for the ContractState struct.
-    
+        fn move(ref world: IWorldDispatcher, direction: Direction) {
+            // Get the address of the current caller, possibly the player's address.
+            let player = get_caller_address();
 
             // Retrieve the player's current position and moves data from the world.
+            let (mut position, mut moves) = get!(world, player, (Position, Moves));
 
+            // Deduct one from the player's remaining moves.
+            moves.remaining -= 1;
+
+            // Update the last direction the player moved in.
+            moves.last_direction = direction;
+
+            // Calculate the player's next position based on the provided direction.
+            let next = next_position(position, direction);
+
+            // Update the world state with the new moves data and position.
+            set!(world, (moves, next));
+            // Emit an event to the world to notify about the player's move.
+            emit!(world, (Moved { player, direction }));
         }
     }
+}
+
+// Define function like this:
+fn next_position(mut position: Position, direction: Direction) -> Position {
+    match direction {
+        Direction::None => { return position; },
+        Direction::Left => { position.vec.x -= 1; },
+        Direction::Right => { position.vec.x += 1; },
+        Direction::Up => { position.vec.y -= 1; },
+        Direction::Down => { position.vec.y += 1; },
+    };
+    position
+}
