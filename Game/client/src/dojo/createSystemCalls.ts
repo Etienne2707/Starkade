@@ -2,11 +2,8 @@ import { AccountInterface } from "starknet";
 import { Entity, getComponentValue } from "@dojoengine/recs";
 import { uuid } from "@latticexyz/utils";
 import { ClientComponents } from "./createClientComponents";
-import {
-  getEntityIdFromKeys,
-  getEvents,
-  setComponentsFromEvents,
-} from "@dojoengine/utils";
+import { GameState } from "../utils";
+import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { ContractComponents } from "./generated/contractComponents";
 import type { IWorld } from "./generated/generated";
 
@@ -17,9 +14,9 @@ export function createSystemCalls(
   _contractComponents: ContractComponents,
   {}: ClientComponents
 ) {
-  const spawn = async (account: AccountInterface) => {
+  const create_player = async (account: AccountInterface) => {
     try {
-      const { transaction_hash } = await client.actions.spawn({
+      const { transaction_hash } = await client.actions.create_player({
         account,
       });
 
@@ -39,24 +36,39 @@ export function createSystemCalls(
     }
   };
 
-  const move = async ({
+  const create_game = async (account: AccountInterface) => {
+    try {
+      const { transaction_hash } = await client.actions.create_game({
+        account,
+      });
+
+      await account.waitForTransaction(transaction_hash, {
+        retryInterval: 100,
+      });
+
+      console.log(
+        await account.waitForTransaction(transaction_hash, {
+          retryInterval: 100,
+        })
+      );
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const join = async ({
     account,
-    x,
-    y,
-    color,
+    game_id,
   }: {
     account: AccountInterface;
-    player_id: number;
-    x: number;
-    y: number;
-    color: bigint;
+    game_id: number;
   }) => {
     try {
-      const { transaction_hash } = await client.actions.paint({
+      const { transaction_hash } = await client.actions.join({
         account,
-        x,
-        y,
-        color,
+        game_id,
       });
 
       await account.waitForTransaction(transaction_hash, {
@@ -75,8 +87,40 @@ export function createSystemCalls(
     }
   };
 
+  const leave = async ({
+    account,
+    game_id,
+  }: {
+    account: AccountInterface;
+    game_id: number;
+  }) => {
+    try {
+      const { transaction_hash } = await client.actions.leave({
+        account,
+        game_id,
+      });
+
+      await account.waitForTransaction(transaction_hash, {
+        retryInterval: 100,
+      });
+
+      console.log(
+        await account.waitForTransaction(transaction_hash, {
+          retryInterval: 100,
+        })
+      );
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+
   return {
-    spawn,
-    move,
+    create_player,
+    create_game,
+    join,
+    leave,
   };
 }

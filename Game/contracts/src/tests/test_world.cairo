@@ -1,86 +1,93 @@
 #[cfg(test)]
 mod tests {
+    use starknet::class_hash::Felt252TryIntoClassHash;
     // import world dispatcher
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-
     // import test utils
     use dojo::test_utils::{spawn_test_world, deploy_contract};
-
     // import test utils
-    use boot_camp_paint::{
+    use dojo_starter::{
         systems::{actions::{actions, IActionsDispatcher, IActionsDispatcherTrait}},
-        models::{player::{Player, player}, tile::{Tile, tile}}
+        models::{game::{Game,GameTrait,GameState,game}, player::{Player,PlayerTrait,PlayerAssert,player}}
     };
+    use dojo_starter::constant::{ZERO};
 
-    const PLAYER_ONE: u32 = 1;
+    #[test]
+    fn test_world() {
 
-    fn player_one_address() -> starknet::ContractAddress {
-        starknet::contract_address_const::<0x0>()
-    }
+        let player_1 = starknet::contract_address_const::<0x10>();
+        let player_2 = starknet::contract_address_const::<0x15>();
+        let player_3 = starknet::contract_address_const::<0x20>();
 
-    fn setup() -> (IWorldDispatcher, IActionsDispatcher) {
-        // [deploy models]
-        let mut models = array![player::TEST_CLASS_HASH, tile::TEST_CLASS_HASH];
 
-        // [deploy world passing in models]
+        let mut models = array![game::TEST_CLASS_HASH, player::TEST_CLASS_HASH];
+
         let world = spawn_test_world(models);
 
-        // [deploy actions]
+
         let contract_address = world
             .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
-
         let actions_system = IActionsDispatcher { contract_address };
 
-        (world, actions_system)
-    }
 
-    fn spawn() -> (IWorldDispatcher, IActionsDispatcher) {
-        // [set caller address]
-        starknet::testing::set_contract_address(player_one_address());
+        let A = actions_system.create_player(player_1);
+        let B = actions_system.create_player(player_2);
+        let C = actions_system.create_player(player_3);
 
-        // [setup world]
-        let (world, actions_system) = setup();
+        assert(A.get_name() != 0, 'Name errure');
+        assert(B.get_name() != 0, 'Name errure 2');
 
-        // [spawn]
-        actions_system.spawn();
 
-        (world, actions_system)
-    }
+        let game = actions_system.create_game(player_1);
+        let gameId = A.get_gameid();
+        assert(game.game_id == gameId, 'Erreyr de gameId');
+        assert(game.player_1 == player_1, 'Erreur player 1 not in game');
+        actions_system.join(player_2,gameId);
+        let game = get!(world , (gameId), Game);
+        assert(game.player_2 == player_2, 'PLayer 2 join error');
+        assert(game.state == GameState::Lock, 'Game full but not locked');
+        actions_system.leave(player_2,gameId);
+        let game = get!(world , (gameId), Game);
+        let B = get!(world,(player_2), Player);
+        assert(game.player_2 == ZERO(), 'Not reset player 2 after leave');
+        assert(B.game_id == 0, 'PLayer 2 game_id no reset');
+        actions_system.join(player_3, gameId);
+        let game = get!(world , (gameId), Game);
+        assert(game.player_2 == C.address, 'Player 3 join no update');
+        actions_system.leave(player_1,gameId);
+        let game = get!(world , (gameId), Game);
+        assert(game.game_id == 0 && game.player_1 == ZERO() && game.player_2 == ZERO(), 'Allez');
+       // actions_system.leave(player_2,gameId);
 
-    const TILE_X: u16 = 1;
-    const TILE_Y: u16 = 1;
-    const TILE_COLOR: felt252 = 'red';
+        //actions_system.join(player_3,gameId);
 
-    fn place() -> (IWorldDispatcher, IActionsDispatcher) {
-        starknet::testing::set_contract_address(player_one_address());
-        // [setup world]
-        let (world, actions_system) = spawn();
-
-        // [act] x=1, y=1, red=encoded
-        actions_system.paint(TILE_X, TILE_Y, TILE_COLOR);
-
-        (world, actions_system)
-    }
-
-    #[test]
-    #[available_gas(30000000)]
-    fn test_spawn() {
-        // [setup world]
-        let (world, _) = spawn();
-
-        // [assert]
-        let player = get!(world, (player_one_address()), Player);
-        assert(player.address == player_one_address(), 'address is wrong');
     }
 
     #[test]
-    #[available_gas(30000000)]
-    fn test_place() {
-        // [setup world]
-        let (world, _) = place();
+    #[should_panic]
+    fn same_player_created() {
 
-        // [assert]
-        let tile = get!(world, (TILE_X, TILE_Y), Tile);
-        assert(tile.color == TILE_COLOR, 'tile not red');
+        let player_1 = starknet::contract_address_const::<0x10>();
+
+        let mut models = array![game::TEST_CLASS_HASH, player::TEST_CLASS_HASH];
+
+        let world = spawn_test_world(models);
+
+
+        let contract_address = world
+            .deploy_contract('salt', actions::TEST_CLASS_HASH.try_into().unwrap(), array![].span());
+        let actions_system = IActionsDispatcher { contract_address };
+
+
+        actions_system.create_player(player_1);
+        actions_system.create_player(player_1);        
+
+    }
+
+    #[test]
+    #[should_panic]
+    fn empty() {
+        let test = starknet::contract_address_const::<0x10>();
+        assert(test == ZERO(), '');
     }
 }

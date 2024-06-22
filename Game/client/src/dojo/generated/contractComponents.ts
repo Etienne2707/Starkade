@@ -2,35 +2,41 @@
 
 import { defineComponent, Type as RecsType, World } from "@dojoengine/recs";
 
-export type ContractComponents = Awaited<ReturnType<typeof defineContractComponents>>;
+export type ContractComponents = Awaited<
+    ReturnType<typeof defineContractComponents>
+>;
 
 export function defineContractComponents(world: World) {
-  return {
-    Player: (() => {
-      return defineComponent(
-        world,
-        { address: RecsType.BigInt, player: RecsType.Number, last_action: RecsType.BigInt },
-        {
-          metadata: {
-            name: "Player",
-            types: ["contractaddress","u32","u64"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    Tile: (() => {
-      return defineComponent(
-        world,
-        { x: RecsType.Number, y: RecsType.Number, color: RecsType.BigInt },
-        {
-          metadata: {
-            name: "Tile",
-            types: ["u16","u16","felt252"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-  };
+    return {
+        Game: (() => {
+            return defineComponent(
+                world,
+                { game_id: RecsType.Number, player_1 : RecsType.BigInt, player_2 : RecsType.BigInt, state : RecsType.Number },
+                {
+                    metadata: {
+                        name: "Game",
+                        types: ["u128", "contractaddress","contractaddress", "enum"],
+                        customTypes: ["GameState"],
+                    },
+                }
+            );
+        })(),
+        Player: (() => {
+            return defineComponent(
+                world,
+                {
+                    address: RecsType.BigInt,
+                    name : RecsType.BigInt,
+                    game_id : RecsType.Number,
+                },
+                {
+                    metadata: {
+                        name: "Player",
+                        types: ["contractaddress", "felt252", "u128"],
+                        customTypes: ["Direction"],
+                    },
+                }
+            );
+        })(),
+    };
 }
