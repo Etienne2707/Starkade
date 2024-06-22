@@ -13,7 +13,7 @@ add_module() {
 game_name=$1
 
 # Create project
-make CONTAINER=podman GAME_INIT=${game_name} game_init
+make GAME_INIT=${game_name} game_init
 
 # Cleanup project
 rm -rf starkade-cairo/${game_name}/.git
