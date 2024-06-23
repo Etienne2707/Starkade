@@ -1,12 +1,7 @@
-import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
-const WorkInProgress = () => {
-	return (
-		<div>
-			<h2>Test Game</h2>
-			<div id="root"></div>
-		</div>
-	);
-};
+export default function Page() {
+  redirect('http://localhost:5173');
 
-export default WorkInProgress;
+  return null; // This component doesn't render anything
+}
